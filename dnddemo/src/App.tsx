@@ -1,26 +1,51 @@
-import React from 'react';
+import React, {useState} from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 type Board = number[][];
 
+type Direction = "vertical" | "horizontal";
+
 interface Submarine {
-    direction: 'horizontal' | 'vertical',
+    direction: Direction,
     length: number,
     id: number,
+    name: string,
 }
 
-/*
-    submarines: [
-      { direction: 'horizontal', length: 4, id: -1  },
-      { direction: 'horizontal', length: 2, id: -1, },
-      { direction: 'vertical', length: 2, id: -1,   },
-      { direction: 'vertical', length: 3, id: -1    },
-    ]
- */
-function Sidebar(props: { submarines: Submarine[] }) {
+function Submarine(props: { submarine: Submarine }) {
+    const { submarine } = props;
     return (
-        <div></div>
+        <img
+            src={`https://robohash.org/${submarine.name}?size=50x50`}
+        />
+    )
+}
+
+function createSubmarine(
+    direction: Direction, length: number, name: string, id=-1): Submarine {
+    return {
+        direction,
+        length,
+        id,
+        name,
+    };
+}
+
+function Sidebar(props: {}) {
+    const submarines = [
+        createSubmarine('horizontal', 2, 'Paris'),
+        createSubmarine('horizontal', 4, 'New York'),
+        createSubmarine('vertical', 3, 'Barcelona'),
+        createSubmarine('vertical', 5, 'London'),
+    ];
+    return (
+        <div className="sidebar">
+            {submarines.map(sub => (
+                <Submarine submarine={sub} />
+            ))}
+
+        </div>
     )
 }
 
@@ -31,29 +56,37 @@ function Sidebar(props: { submarines: Submarine[] }) {
  *   [0, 0, 0, 2, 0, 0],
  * ]
  */
-function MainGrid(props: { board: Board }) {
-  return (
-      <div></div>
+type SetBoardFn = (_: Board) => void;
+function MainGrid(props: { board: Board, setBoard: SetBoardFn }) {
+    const { board, setBoard } = props;
+
+    return (
+      <div className="grid">
+          {board.map((row, rowIndex) => (
+              <tr>
+                  {row.map((item, columnIndex) => (
+                      <td>{item !== 0 ? item : ''}</td>
+                  ))}
+              </tr>
+          ))}
+      </div>
   )
 }
+const initialBoard = [
+    [0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 2, 0, 0],
+    [0, 0, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+];
 
 function App() {
+    const [board, setBoard] = useState(initialBoard);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Sidebar />
+        <MainGrid board={board} setBoard={setBoard} />
     </div>
   );
 }
